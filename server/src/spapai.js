@@ -17,7 +17,7 @@ export async function spApiRequest({ method, path, json }) {
     method,
     host: cfg.host,
     path,
-    headers,
+    header: headers,
     body,
   });
 

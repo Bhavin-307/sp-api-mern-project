@@ -5,6 +5,10 @@ function sha256(data) {
   return crypto.createHash("sha256").update(data).digest("hex");
 }
 
+function sha256Hex(data) {
+  return crypto.createHash("sha256").update(data, "utf8").digest("hex");
+}
+
 function hmac(key, str) {
   return crypto.createHmac("sha256", key).update(str).digest();
 }
@@ -23,9 +27,11 @@ export function signAws({
 }) {
   const server = "execute-api";
   const region = cfg.region;
+
   const now = new Date();
-  const amzDate = now.toISOString().replace(/[:-]|\.\d{3}/g, "") + "Z";
+  const amzDate = now.toISOString().replace(/[:-]|\.\d{3}/g, "");
   const dateStamp = amzDate.slice(0, 8);
+
   const canonicalHeaderObj = {
     host,
     "x-amz-date": amzDate,
@@ -36,6 +42,7 @@ export function signAws({
       ])
     ),
   };
+
   const signedHeaders = Object.keys(canonicalHeaderObj).sort().join(";");
 
   const canonicalHeaders = Object.keys(canonicalHeaderObj)
@@ -45,6 +52,7 @@ export function signAws({
 
   const canonicalQuery = query;
   const payloadHash = sha256Hex(body);
+
   const canonicalRequest = [
     method.toUpperCase(),
     path,
@@ -54,25 +62,28 @@ export function signAws({
     payloadHash,
   ].join("\n");
 
+  
+  console.log(canonicalRequest);
+
   const algorithm = "AWS4-HMAC-SHA256";
   const credentialScope = `${dateStamp}/${region}/${server}/aws4_request`;
+
   const stringToSign = [
     algorithm,
     amzDate,
-    dateStamp,
     credentialScope,
     sha256Hex(canonicalRequest),
   ].join("\n");
 
-  // IMPORTANT: For SP_API we no longer need real AWS keys instead we use DUMMY_DATA
-  const kDate = hmac("AWS4" + "DUMMY_DATA", dateStamp);
+  // 🔑 For SP-API sandbox, we use dummy key
+  const kDate = hmac("AWS4" + cfg.awsSecretAccessKey, dateStamp);
   const kRegion = hmac(kDate, region);
   const kService = hmac(kRegion, server);
   const kSigning = hmac(kService, "aws4_request");
 
   const signature = hmacHex(kSigning, stringToSign);
 
-  const authorization = `${algorithm} Credential=DUMMY_DATA/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
+  const authorization = `${algorithm} Credential=${cfg.awsAccessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
 
   return {
     amzDate,

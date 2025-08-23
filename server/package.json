@@ -20,6 +20,7 @@
     "he": "^1.2.0",
     "mongoose": "^8.17.2",
     "multer": "^2.0.2",
+    "node-fetch": "^3.3.2",
     "zlib": "^1.0.5"
   },
   "devDependencies": {

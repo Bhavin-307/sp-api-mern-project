@@ -10,13 +10,17 @@ app.use(express.json());
 
 app.use("/api/feed", feedRouter);
 
+app.get("/", (req, res) => {
+  res.send("Welcome to the Amazon Title Update API");
+});
+
 app.use((err, req, res, next) => {
   console.error(err?.response?.data || err);
   res.status(500).json({ error: "Internal Error", detail: err?.message });
 });
 
 async function start() {
-  await mongoose.connect(cfg.dbUrl);
+  await mongoose.connect(cfg.mongoUrl);
   app.listen(cfg.port, () => {
     console.log(`Server is running on port http://localhost:${cfg.port}`);
   });
