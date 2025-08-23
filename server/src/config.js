@@ -12,5 +12,10 @@ export const cfg = {
     clientSecret: process.env.LWA_CLIENT_SECRET,
     refreshToken: process.env.LWA_REFRESH_TOKEN,
   },
+  aws: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    roleArn: process.env.ROLE_ARN,
+  },
   sellerId: process.env.SELLER_ID,
 };

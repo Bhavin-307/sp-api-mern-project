@@ -62,9 +62,6 @@ export function signAws({
     payloadHash,
   ].join("\n");
 
-  
-  console.log(canonicalRequest);
-
   const algorithm = "AWS4-HMAC-SHA256";
   const credentialScope = `${dateStamp}/${region}/${server}/aws4_request`;
 
@@ -85,6 +82,8 @@ export function signAws({
 
   const authorization = `${algorithm} Credential=${cfg.awsAccessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
 
+  console.log(authorization);
+  
   return {
     amzDate,
     authorization,
